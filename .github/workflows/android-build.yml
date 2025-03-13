@@ -20,27 +20,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Gradle (needed for generating wrapper)
-        run: |
-          sudo apt-get update
-          sudo apt-get install gradle -y
-
-      # Opsional: Menampilkan struktur file untuk memastikan lokasi build
+      # Opsional: List file untuk verifikasi struktur direktori
       - name: List repository files
         run: ls -la
 
-      # Misalnya, jika file build Gradle ada di folder "android"
       - name: List files in android directory
         run: ls -la android
 
-      # Perbarui Gradle Wrapper di folder "android" ke versi 8.0 dengan distribusi all
-      - name: Generate (or Update) Gradle Wrapper
+      # Pastikan Anda menggunakan wrapper yang sudah diperbarui
+      - name: Check Gradle Version
         working-directory: android
-        run: gradle wrapper --gradle-version 8.0 --distribution-type all
-
-      - name: Grant execute permission for gradlew
-        working-directory: android
-        run: chmod +x gradlew
+        run: ./gradlew --version
 
       - name: Build Debug APK
         working-directory: android
