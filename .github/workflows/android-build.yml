@@ -25,17 +25,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install gradle -y
 
-      # Opsional: List file-file repository untuk memastikan struktur direktori
+      # Opsional: Menampilkan struktur file untuk memastikan lokasi build
       - name: List repository files
         run: ls -la
 
-      # Misalnya, jika proyek Android Anda berada di folder "android"
+      # Misalnya, jika file build Gradle ada di folder "android"
       - name: List files in android directory
         run: ls -la android
 
+      # Perbarui Gradle Wrapper di folder "android" ke versi 8.0 dengan distribusi all
       - name: Generate (or Update) Gradle Wrapper
         working-directory: android
-        run: gradle wrapper --gradle-version 7.6
+        run: gradle wrapper --gradle-version 8.0 --distribution-type all
 
       - name: Grant execute permission for gradlew
         working-directory: android
