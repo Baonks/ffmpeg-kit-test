@@ -2,52 +2,55 @@ name: Android Build
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository (pastikan build.gradle Anda sudah ter-commit di sini)
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Opsional: Tampilkan struktur file untuk memastikan file-file penting ada
+      # Opsional: Menampilkan struktur file untuk verifikasi
       - name: List repository files
         run: ls -la
 
-      - name: List files in android directory
-        run: ls -la android
+      - name: List files in android/test-app-local-dependency directory
+        run: ls -la android/test-app-local-dependency
 
-      # Jika belum ada Gradle Wrapper, langkah ini akan menghasilkannya dengan Gradle 8.0-all.
-      # Jika wrapper sudah ada dan sudah terupdate, langkah ini bisa dilewati atau dibiarkan.
-      - name: Generate Gradle Wrapper (if needed)
-        working-directory: android
+      # Generate (atau update) Gradle Wrapper di direktori subproyek
+      - name: Generate Gradle Wrapper
+        working-directory: android/test-app-local-dependency
         run: gradle wrapper --gradle-version 8.0 --distribution-type all
 
       # Pastikan gradlew memiliki izin eksekusi
       - name: Grant execute permission for gradlew
-        working-directory: android
+        working-directory: android/test-app-local-dependency
         run: chmod +x gradlew
 
-      # Build aplikasi (assembleDebug akan mengambil dependency dari Maven Central sesuai konfigurasi di build.gradle)
+      # Jalankan build assembleDebug; dependency akan diambil dari Maven Central jika sudah diubah di build.gradle
       - name: Build Debug APK
-        working-directory: android
+        working-directory: android/test-app-local-dependency
         run: ./gradlew assembleDebug
 
-      # Upload APK sebagai artifact agar bisa diunduh
+      # Upload file APK yang dihasilkan
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/test-app-local-dependency/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
