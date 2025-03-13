@@ -22,34 +22,34 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Opsional: Menampilkan struktur file untuk verifikasi
+      # Opsional: Tampilkan struktur file untuk verifikasi
       - name: List repository files
         run: ls -la
 
-      - name: List files in android/test-app-local-dependency directory
-        run: ls -la android/test-app-local-dependency
+      - name: List files in android directory
+        run: ls -la android
 
-      # Generate (atau update) Gradle Wrapper di direktori subproyek
+      # Generate (atau perbarui) Gradle Wrapper di direktori android (bukan subproyek)
       - name: Generate Gradle Wrapper
-        working-directory: android/test-app-local-dependency
+        working-directory: android
         run: gradle wrapper --gradle-version 8.0 --distribution-type all
 
-      # Pastikan gradlew memiliki izin eksekusi
+      # Pastikan gradlew memiliki izin eksekusi di direktori android
       - name: Grant execute permission for gradlew
-        working-directory: android/test-app-local-dependency
+        working-directory: android
         run: chmod +x gradlew
 
-      # Jalankan build assembleDebug; dependency akan diambil dari Maven Central jika sudah diubah di build.gradle
-      - name: Build Debug APK
-        working-directory: android/test-app-local-dependency
-        run: ./gradlew assembleDebug
+      # Jalankan build untuk subproyek test-app-local-dependency dari direktori android
+      - name: Build Debug APK for test-app-local-dependency
+        working-directory: android
+        run: ./gradlew :test-app-local-dependency:assembleDebug
 
-      # Upload file APK yang dihasilkan
+      # Upload file APK yang dihasilkan dari subproyek test-app-local-dependency
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: android/test-app-local-dependency/build/outputs/apk/debug/*.apk
+          path: test-app-local-dependency/build/outputs/apk/debug/*.apk
           if-no-files-found: warn
           compression-level: 6
           overwrite: false
