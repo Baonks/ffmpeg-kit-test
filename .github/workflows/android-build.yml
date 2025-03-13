@@ -20,17 +20,36 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Opsional: List file untuk verifikasi struktur direktori
+      - name: Install Gradle (for wrapper generation)
+        run: |
+          sudo apt-get update
+          sudo apt-get install gradle -y
+
+      # Opsional: Verifikasi struktur direktori repository
       - name: List repository files
         run: ls -la
 
       - name: List files in android directory
         run: ls -la android
 
-      # Pastikan Anda menggunakan wrapper yang sudah diperbarui
+      # Unduh file AAR ffmpeg-kit secara otomatis
+      - name: Download ffmpeg-kit AAR
+        run: |
+          mkdir -p ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit
+          wget -O ffmpeg-kit/prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar "https://github.com/tanersener/ffmpeg-kit/releases/download/v6.0/ffmpeg-kit.aar"
+
       - name: Check Gradle Version
         working-directory: android
         run: ./gradlew --version
+
+      # Perbarui Gradle Wrapper ke versi 8.0-all agar kompatibel dengan plugin Android terbaru
+      - name: Generate (or Update) Gradle Wrapper
+        working-directory: android
+        run: gradle wrapper --gradle-version 8.0 --distribution-type all
+
+      - name: Grant execute permission for gradlew
+        working-directory: android
+        run: chmod +x gradlew
 
       - name: Build Debug APK
         working-directory: android
